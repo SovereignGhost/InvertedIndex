@@ -1,8 +1,8 @@
-# Program to create Inverted Index
+# Program to create a token list
 # from given corpus
 # Parse HTML from corpus
-# Tokenize
-# Construct Index
+# Tokenize and stem
+# make a list of unique terms and output to file
 import os
 from bs4 import BeautifulSoup
 from bs4.element import Comment
