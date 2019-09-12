@@ -54,7 +54,7 @@ def tokenizer(direc_path):
     for fname in os.listdir():
 
         # read file and add its name and ID to a dictionary
-        fp = open(fname, 'r', encoding='latin-1', errors='replace')
+        fp = open(fname, 'r', errors='ignore')
         content = fp.read()
         fp.close()
         doc_dictionary[doc_id] = fname
@@ -68,10 +68,10 @@ def tokenizer(direc_path):
         result = parsehtml(htmlcode)
 
         # Tokenize and turn to lower case
-        token_list = nltk.word_tokenize(result)
+        token_list = nltk.regexp_tokenize(result, "[A-Z]{2,}(?![a-z])|[A-Z][a-z]+(?=[A-Z])|[\'\w\-]+")
         for i in range(len(token_list)):
             token_list[i] = token_list[i].lower()
-
+        # print(token_list)
         # print(len(token_list))
 
         # ignore tokens if they're in stop list
@@ -102,7 +102,7 @@ def tokenizer(direc_path):
                 term_id = term_id * 7 + ord(char)
             term_dictionary[term_id] = token_list[i]
             term_id = 3
-        break
+
     # write doc dictionary to file
     os.chdir(current_dir)
     f = open('docids.txt', 'w')
@@ -111,7 +111,7 @@ def tokenizer(direc_path):
     f.close()
 
     # write term dictionary to file
-    f = open('termids.txt', 'w')
+    f = open('termids.txt', 'w', errors='ignore')
     for key, value in term_dictionary.items():
         f.write(str(key) + '\t' + str(value) + '\n')
     f.close()
