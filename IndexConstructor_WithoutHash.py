@@ -119,8 +119,6 @@ def indexconstructor(direc_path):
             term_id = 3
             position_id += 1
         doc_id += 1
-        if doc_id == 50:
-            break
 
         # local sort
         tuplelist.sort(key=sortonterm)
