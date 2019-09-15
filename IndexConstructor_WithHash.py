@@ -1,4 +1,5 @@
 import os
+import sys
 from bs4 import BeautifulSoup
 from bs4.element import Comment
 import nltk
@@ -143,5 +144,5 @@ def indexconstructor(direc_path):
 
 
 
-directory = 'D:\Academics\Semester 5\Information Retrieval\Assignment 1\corpus\corpus\corpus'
+directory = sys.argv[1]
 indexconstructor(directory)
