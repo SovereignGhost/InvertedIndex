@@ -4,6 +4,7 @@
 # Tokenize and stem
 # make a list of unique terms and output to file
 import os
+import sys
 from bs4 import BeautifulSoup
 from bs4.element import Comment
 import nltk
@@ -118,6 +119,6 @@ def tokenizer(direc_path):
 
 
 
-directory = 'D:\Academics\Semester 5\Information Retrieval\Assignment 1\corpus\corpus\corpus'
+directory = sys.argv[1]
 
 tokenizer(directory)
