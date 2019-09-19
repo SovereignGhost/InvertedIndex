@@ -35,6 +35,16 @@ def indexconstructor(direc_path):
     # change working directory to specified one
     # process all files and tokenize
 
+    termids = {}
+    fp = open("termids.txt", 'r')
+    termlist = list(fp)
+    fp.close()
+    for entry in termlist:
+        entry = entry[0:-1]
+        pair = entry.split('\t')
+        termids[pair[1]] = int(pair[0])
+    termlist = []
+
     # get all lines of stop-list
     # remove newline character at the end
     fp = open('stoplist.txt', 'r')
@@ -50,7 +60,7 @@ def indexconstructor(direc_path):
     flist.extend(os.listdir(direc_path))
 
     doc_id = 1
-    term_id = 3
+    term_id = 1
     term_dictionary = {}
 
     # main loop
@@ -95,30 +105,32 @@ def indexconstructor(direc_path):
         position = 0
         for i in range(len(token_list)):
             position += 1
-            for char in token_list[i]:
-                term_id = term_id * 7 + ord(char)
+            if token_list[i] in termids:
+                term_id = termids.get(token_list[i])
 
-            if term_id not in term_dictionary:
-                termdocs = []
-                docposition_list = [doc_id, position]    # document id, first position
-                termdocs.append(docposition_list)
-                term_dictionary[term_id] = termdocs     # 2d posting list
-            else:
-                termdocs = term_dictionary.get(term_id)  # get posting list
-                lastdocid = 0
-
-                for array in termdocs:  # calculate latest docid
-                    lastdocid = lastdocid + array[0]
-
-                if doc_id == lastdocid:  # calculate latest position id and insert current position with gap encoding
-                    latestposition = 0
-                    for positions in termdocs[-1][1:]:
-                        latestposition = latestposition + positions
-                    termdocs[-1].append(position - latestposition)
-                else:
-                    docposition_list = [doc_id - lastdocid, position]
+                if term_id not in term_dictionary:
+                    termdocs = []
+                    docposition_list = [doc_id, position]    # document id, first position
                     termdocs.append(docposition_list)
-            term_id = 3
+                    term_dictionary[term_id] = termdocs     # 2d posting list
+                else:
+                    termdocs = term_dictionary.get(term_id)  # get posting list
+                    lastdocid = 0
+
+                    for array in termdocs:  # calculate latest docid
+                        lastdocid = lastdocid + array[0]
+
+                    if doc_id == lastdocid:  # calculate latest position id and insert current position with gap encoding
+                        latestposition = 0
+                        for positions in termdocs[-1][1:]:
+                            latestposition = latestposition + positions
+                        termdocs[-1].append(position - latestposition)
+                    else:
+                        docposition_list = [doc_id - lastdocid, position]
+                        termdocs.append(docposition_list)
+            else:
+                print(token_list[i] + " is not in dictionary")
+
         doc_id += 1
 
     # writing to term_index.txt
@@ -139,9 +151,6 @@ def indexconstructor(direc_path):
                     fp.write(str(array[i]) + ",")
         fp.write("\n")
     fp.close()
-
-
-
 
 
 directory = sys.argv[1]

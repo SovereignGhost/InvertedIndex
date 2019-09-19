@@ -4,26 +4,35 @@ from nltk import PorterStemmer
 def readfile(arg):
 
     if str(arg[0]) == '--term':
+        termdict = {}
+        fp = open("termids.txt", 'r')
+        termlist = list(fp)
+        fp.close()
+        for entry in termlist:
+            entry = entry[0:-1]
+            pair = entry.split('\t')
+            termdict[pair[1]] = int(pair[0])
+        termlist = []
 
         stemmer = PorterStemmer()   # stem the term
         term = stemmer.stem(str(arg[1]))
-        termid = 3
-        for char in term:  # calculate term id
-            termid = termid * 7 + ord(char)
+        termid = termdict.get(term)
+
         index = open("term_index.txt", "r")
         dictionary = {}
         for line in index:
-            list = line.split()
-            dictionary[list[0]] = (list[1], list[2])
+            List = line.split()
+            dictionary[int(List[0])] = (List[1], List[2])
         index.close()
 
-        if str(termid) in dictionary:
-            lol = 3
+        if termid in dictionary:
             print("Listing for term: " + str(arg[1]) + "\n")
             print("TERMID: " + str(termid) + "\n")
-            tuple = dictionary.get(str(termid))  # tuple format: (frequency in corpus, total documents containing term)
+            tuple = dictionary.get(termid)  # tuple format: (frequency in corpus, total documents containing term)
             print("Number of documents containing term: " + str(tuple[1]) + "\n")
             print("Term frequency in corpus: " + str(tuple[0]) + "\n")
+        else:
+            print(term + " is not present in index")
 
 
 readfile(sys.argv[1:])
