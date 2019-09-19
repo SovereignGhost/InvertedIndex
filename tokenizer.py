@@ -1,8 +1,8 @@
-# Program to create a token list
+# Program to create tokenized terms
 # from given corpus
 # Parse HTML from corpus
-# Tokenize and stem
-# make a list of unique terms and output to file
+# Tokenize
+# output to file
 import os
 import sys
 from bs4 import BeautifulSoup
@@ -49,8 +49,7 @@ def tokenizer(direc_path):
     term_dictionary = {}
     doc_dictionary = {}
     doc_id = 1
-    term_id = 3
-
+    term_id = 1
     # main loop
     for fname in os.listdir():
 
@@ -95,30 +94,30 @@ def tokenizer(direc_path):
         stemmer = PorterStemmer()
         for i in range(len(token_list)):
             token_list[i] = stemmer.stem(token_list[i])
-        # print(token_list)
 
-        # calculate unique term id
+
+        # put terms as key in dictionary with incremented term id as value
         for i in range(len(token_list)):
-            for char in token_list[i]:
-                term_id = term_id * 7 + ord(char)
-            term_dictionary[term_id] = token_list[i]
-            term_id = 3
+            if token_list[i] not in term_dictionary:
+                term_dictionary[token_list[i]] = term_id
+                term_id = term_id + 1
 
-    # write doc dictionary to file
+    # write doc dictionary to file, format is term id /t term
+    # term ids become keys and terms become values
     os.chdir(current_dir)
     f = open('docids.txt', 'w')
-    for key, value in doc_dictionary.items():
+    for value, key in doc_dictionary.items():
         f.write(str(key) + '\t' + str(value) + '\n')
     f.close()
 
     # write term dictionary to file
     f = open('termids.txt', 'w', errors='ignore')
     for key, value in term_dictionary.items():
-        f.write(str(key) + '\t' + str(value) + '\n')
+        f.write(str(value) + '\t' + str(key) + '\n')
     f.close()
-
+    return (term_dictionary,doc_dictionary)
 
 
 directory = sys.argv[1]
-
 tokenizer(directory)
+

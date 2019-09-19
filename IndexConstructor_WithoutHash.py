@@ -59,6 +59,16 @@ def indexconstructor(direc_path):
     for i in range(len(stoplist)):
         stoplist[i] = stoplist[i][:-1]
 
+    termdict = {}
+    fp = open("termids.txt", 'r')
+    termlist = list(fp)
+    fp.close()
+    for entry in termlist:
+        entry = entry[0:-1]
+        pair = entry.split('\t')
+        termdict[pair[1]] = int(pair[0])
+    termlist = []
+
     # change path to where corpus is
     current_dir = os.getcwd()
     os.chdir(direc_path)
@@ -66,7 +76,7 @@ def indexconstructor(direc_path):
     flist.extend(os.listdir(direc_path))
 
     doc_id = 1
-    term_id = 3
+    term_id = 1
     corpustuples = []
 
     # main loop
@@ -86,6 +96,7 @@ def indexconstructor(direc_path):
 
         # Tokenize and turn to lower case
         token_list = nltk.regexp_tokenize(result, "[A-Z]{2,}(?![a-z])|[A-Z][a-z]+(?=[A-Z])|[\'\w\-]+")
+
         for i in range(len(token_list)):
             token_list[i] = token_list[i].lower()
 
@@ -112,17 +123,17 @@ def indexconstructor(direc_path):
         position_id = 1
         # calculate unique term id, and make a new tuple of format termid, docid, positionid
         for i in range(len(token_list)):
-            for char in token_list[i]:
-                term_id = term_id * 7 + ord(char)
-
-            newtuple = (term_id, doc_id, position_id)
-            tuplelist.append(newtuple)
-            term_id = 3
+            if token_list[i] in termdict:
+                term_id = termdict.get(token_list[i])
+                newtuple = (term_id, doc_id, position_id)
+                tuplelist.append(newtuple)
+            else:
+                print(token_list[i] + " is not in dictionary")
             position_id += 1
         doc_id += 1
 
         # local sort
-        tuplelist.sort(key=sortonterm)
+        tuplelist.sort()
         corpustuples.append(tuplelist)
 
     # Priority queue for merging
@@ -186,7 +197,6 @@ def indexconstructor(direc_path):
                     fp.write(str(term_index[i].doclist[j][k]))
         fp.write("\n")
     fp.close()
-
 
 
 directory = sys.argv[1]
